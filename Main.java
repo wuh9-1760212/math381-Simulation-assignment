@@ -12,8 +12,10 @@ public class Main {
     public static void main(String[] args) throws
                                             FileNotFoundException{
         Random r = new Random();
-        //outputPlotData(r, "firstThreeMax");
-        outputPlotDataVersionTwo(r, "firstThreeMax");
+        outputPlotData(r, "firstThreeMax");
+        outputPlotData(r, "conservative");
+        //outputPlotDataVersionTwo(r, "firstThreeMax");
+        //outputPlotDataVersionTwo(r, "conservative");
         //playGameVersionOne(r);//let conservative against strategy 2
         //playGameVersionTwo(r, "conservative");//let conservative against player 2
         //playGameVersionTwo(r, "firstThreeMax");//let strategy 2 against player 2
@@ -27,22 +29,32 @@ public class Main {
     //out put a txt file that record the win rate of player 1.(the diagram to show normal distribution)
     public static void outputPlotData(Random r, String playerOneStrate) throws
             FileNotFoundException{
-        PrintStream output = new PrintStream(new File("output1.txt"));
+        String fileName = "";
+        if (playerOneStrate.equals("conservative")) {
+            fileName = "conserve vs p2.txt";
+        } else if (playerOneStrate.equals("firstThreeMax")) {
+            fileName = "firstThree vs p2.txt";
+        }
+        PrintStream output = new PrintStream(new File(fileName));
+        PrintStream output2 = new PrintStream(new File("p2 vs " + playerOneStrate + ".txt"));
+        PrintStream output3 = new PrintStream(new File("Score for " + playerOneStrate + " " + fileName));
         for (int i = 1; i <= ROUND * 5; i++) {
             int[]result = new int[3];
             for (int j = 1; j <= ROUND; j++) {
                 ArrayList<Integer>playerOne = new ArrayList<>();
-                ArrayList<Integer>playerTwo = new ArrayList<>();
                 if (playerOneStrate.equals("conservative")) {
                     playerOne = conservative(r);
                 } else if (playerOneStrate.equals("firstThreeMax")) {
                     playerOne = maxFirstThree(r);
                 }
                 int score = sumResult(playerOne);
+                output3.print(score + " ");
                 playerTwoStrategy(score, result, r);
             }
             double playOneWinProb = result[0] * 100.0 / ROUND;
+            double playTwoWinPRob = result[1] * 100.0 / ROUND;
             output.print(playOneWinProb + " ");
+            output2.print(playTwoWinPRob + " ");
         }
     }
 
@@ -52,21 +64,24 @@ public class Main {
     //out put a txt file that record the win rate of player 1.(the diagram to show the convergence)
     public static void outputPlotDataVersionTwo(Random r, String playerOneStrate) throws
             FileNotFoundException{
+        String fileName = "";
+        if (playerOneStrate.equals("conservative")) {
+            fileName = "conserve vs p2.txt";
+        } else if (playerOneStrate.equals("firstThreeMax")) {
+            fileName = "firstThree vs p2.txt";
+        }
         for (int k = 1; k <= TIMES; k++) {
-            PrintStream output = new PrintStream(new File("output" + (k + 1)+ ".txt"));
-            for (int i = 1; i <= ROUND; i++) {
-                int[] result = new int[3];
-                for (int j = 1; j <= i; j++) {
-                    ArrayList<Integer> playerOne = new ArrayList<>();
-                    ArrayList<Integer> playerTwo = new ArrayList<>();
-                    if (playerOneStrate.equals("conservative")) {
-                        playerOne = conservative(r);
-                    } else if (playerOneStrate.equals("firstThreeMax")) {
-                        playerOne = maxFirstThree(r);
-                    }
-                    int score = sumResult(playerOne);
-                    playerTwoStrategy(score, result, r);
+            PrintStream output = new PrintStream(new File("Times " + k + " " + fileName));
+            int[] result = new int[3];
+            for (int i = 1; i <= ROUND * 10; i++) {
+                ArrayList<Integer> playerOne = new ArrayList<>();
+                if (playerOneStrate.equals("conservative")) {
+                    playerOne = conservative(r);
+                } else if (playerOneStrate.equals("firstThreeMax")) {
+                    playerOne = maxFirstThree(r);
                 }
+                int score = sumResult(playerOne);
+                playerTwoStrategy(score, result, r);
                 double playOneWinProb = result[0] * 100.0 / i;
                 output.print(playOneWinProb + " ");
             }
